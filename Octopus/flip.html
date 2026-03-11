@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flip Side Adventures 🪙✨ - OctoKid</title>
+  <style>
+    :root {
+      --sea-dark: #0a1f3d;
+      --octo-orange: #ff6b00;
+      --happy-cyan: #00ffcc;
+      --curious-yellow: #ffd700;
+      --flip-purple: #c084fc;
+      --glow: rgba(0,255,204,0.4);
+      --listening-green: #00ff7f;
+      --text-light: #e0f2fe;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom, var(--sea-dark), #001122);
+      color: var(--text-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    nav {
+      width: 100%;
+      background: #000;
+      padding: 1rem 0;
+      display: flex;
+      justify-content: center;
+      border-bottom: 3px solid var(--happy-cyan);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    nav a {
+      color: var(--happy-cyan);
+      text-decoration: none;
+      margin: 0 20px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .container {
+      max-width: 500px;
+      width: 90%;
+      padding: 20px 15px;
+      text-align: center;
+    }
+    h1 {
+      color: var(--octo-orange);
+      text-shadow: 2px 2px var(--curious-yellow);
+      font-size: 2.4em;
+      margin: 20px 0 10px;
+    }
+    h2 { color: var(--flip-purple); margin: 30px 0 15px; }
+    select, button {
+      font-size: 1.1em;
+      padding: 12px 20px;
+      margin: 12px 0;
+      border-radius: 20px;
+      border: 3px solid var(--happy-cyan);
+      background: rgba(255,255,255,0.08);
+      color: var(--text-light);
+      cursor: pointer;
+      width: 100%;
+      max-width: 320px;
+      font-family: inherit;
+    }
+    select option {
+      background: #0a1f3d;
+      color: var(--text-light);
+    }
+    button.flip-btn {
+      background: linear-gradient(135deg, var(--flip-purple), #9f7aea);
+      border-color: white;
+      font-weight: bold;
+    }
+    .card {
+      background: rgba(255,255,255,0.06);
+      border: 2px solid var(--happy-cyan);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .question { font-size: 1.5em; margin-bottom: 15px; }
+    .flip-prompt {
+      background: rgba(192,132,252,0.15);
+      border: 2px dashed var(--flip-purple);
+      border-radius: 15px;
+      padding: 15px;
+      margin: 20px 0;
+      font-size: 1.3em;
+      line-height: 1.4;
+    }
+    .feedback {
+      font-size: 1.4em;
+      font-weight: bold;
+      margin: 20px 0;
+      min-height: 60px;
+    }
+    .emoji-big { font-size: 4em; margin: 15px 0; }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.1em;
+      border-radius: 15px;
+      border: 2px solid var(--happy-cyan);
+      background: rgba(255,255,255,0.1);
+      color: var(--text-light);
+      margin: 10px 0;
+      box-sizing: border-box;
+    }
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .mic-btn {
+      font-size: 2.2em;
+      padding: 14px 20px;
+      border-radius: 50%;
+      background: var(--octo-orange);
+      border: none;
+      color: white;
+      cursor: pointer;
+      min-width: 70px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .mic-btn.listening {
+      background: var(--listening-green);
+      animation: pulse-mic 1.5s infinite;
+      transform: scale(1.15);
+      box-shadow: 0 0 20px var(--listening-green);
+    }
+    @keyframes pulse-mic {
+      0% { box-shadow: 0 0 0 0 rgba(0,255,127,0.7); }
+      70% { box-shadow: 0 0 0 20px rgba(0,255,127,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,255,127,0); }
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="preschool.html">Back to Preschool</a>
+</nav>
+
+<div class="container">
+  <h1>Flip Side Adventures 🪙✨</h1>
+  <p style="font-size:1.1em; opacity:0.9;">Classic question → flip the coin → think the other way!</p>
+
+  <div id="start-screen">
+    <h2>Pick a Topic to Flip!</h2>
+    <select id="topic">
+      <option value="colors">Colors 🎨</option>
+      <option value="animals">Animals 🦁</option>
+      <option value="shapes">Shapes 📐</option>
+      <option value="numbers">Numbers 🔢</option>
+      <option value="family">Family 👨‍👩‍👧‍👦</option>
+    </select>
+    <button class="flip-btn" onclick="startFlipAdventure()">Start Flipping! 🔄</button>
+  </div>
+
+  <div id="adventure-screen" class="hidden">
+    <div class="card">
+      <div id="question" class="question"></div>
+      <div id="emoji" class="emoji-big"></div>
+    </div>
+
+    <div id="classic-answer-area">
+      <h3>What do you think?</h3>
+      <div class="input-row">
+        <input type="text" id="classic-answer" placeholder="Type or say your answer..." />
+        <button class="mic-btn" id="mic-btn" onclick="toggleListening()">🎤</button>
+      </div>
+      <button onclick="submitClassic()">Tell Octo! 🦑</button>
+    </div>
+
+    <div id="flip-section" class="hidden">
+      <div class="flip-prompt" id="flip-text">🤔 Flipping the coin...</div>
+      <div class="input-row">
+        <textarea id="response-input" placeholder="What do YOU think?"></textarea>
+      </div>
+      <button onclick="submitFlipResponse()">Share Your Idea! ✨</button>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+    <button onclick="backToStart()" style="margin-top:30px;">Back to Topics</button>
+  </div>
+
+  <div style="margin-top:40px; font-size:0.9em; opacity:0.7;">
+    Powered by Grok • Ask a grown-up if needed • Flip Side = fun "what if" thinking!
+  </div>
+</div>
+
+<script>
+const appData = JSON.parse(localStorage.getItem('octoData') || '{}');
+const apiKey = appData.apiKey;
+
+let recognition = null;
+let isListening = false;
+
+function startListening() {
+  if (recognition) recognition.stop();
+
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = e => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript + ' ';
+    }
+    const text = final || interim;
+    if (text.trim()) {
+      const activeEl = document.getElementById('classic-answer-area').classList.contains('hidden') 
+        ? document.getElementById('response-input') 
+        : document.getElementById('classic-answer');
+      activeEl.value = text.trim();
+    }
+  };
+
+  recognition.onerror = e => console.error('Mic error:', e.error);
+
+  recognition.onend = () => {
+    if (isListening) setTimeout(startListening, 1200);
+  };
+
+  recognition.start();
+  isListening = true;
+  document.getElementById('mic-btn').classList.add('listening');
+}
+
+function stopListening() {
+  isListening = false;
+  if (recognition) recognition.stop();
+  document.getElementById('mic-btn').classList.remove('listening');
+}
+
+function toggleListening() {
+  if (isListening) stopListening();
+  else startListening();
+}
+
+window.addEventListener('beforeunload', stopListening);
+
+async function callGrok(systemPrompt, maxTokens = 60) {
+  if (!apiKey) return "My ink is blurry! Ask a grown-up to add the Grok key. 🦑";
+  try {
+    const res = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'grok-4-1-fast-reasoning',
+        messages: [{ role: 'system', content: systemPrompt }],
+        max_tokens: maxTokens,
+        temperature: 0.85
+      })
+    });
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    return data.choices[0].message.content.trim();
+  } catch (err) {
+    console.error(err);
+    return "Oops! Tentacles tangled! 🦑";
+  }
+}
+
+const flipTopics = {
+  colors: [
+    { q: "What color is the sky?", emoji: "☁️", classic: "blue" },
+    { q: "What color are bananas?", emoji: "🍌", classic: "yellow" },
+    { q: "What color is grass?", emoji: "🌱", classic: "green" }
+  ],
+  animals: [
+    { q: "What sound does a cat make?", emoji: "🐱", classic: "meow" },
+    { q: "Who says woof?", emoji: "🐶", classic: "dog" },
+    { q: "Big animal with trunk?", emoji: "🐘", classic: "elephant" }
+  ],
+  shapes: [
+    { q: "Shape like a ball?", emoji: "⚽", classic: "circle" },
+    { q: "Shape like a box?", emoji: "📦", classic: "square" },
+    { q: "Shape like pizza slice?", emoji: "🍕", classic: "triangle" }
+  ],
+  numbers: [
+    { q: "How many fingers on one hand?", emoji: "✋", classic: "5" },
+    { q: "1 + 1 equals?", emoji: "➕", classic: "2" },
+    { q: "How many legs on a spider?", emoji: "🕷️", classic: "8" }
+  ],
+  family: [
+    { q: "Who gives you hugs at home?", emoji: "🤗", classic: "family" },
+    { q: "Who is your mum?", emoji: "👩", classic: "mother" },
+    { q: "Who lives with you?", emoji: "🏠", classic: "family" }
+  ]
+};
+
+let currentTopic = '';
+let currentQIndex = 0;
+
+function startFlipAdventure() {
+  currentTopic = document.getElementById('topic').value;
+  currentQIndex = 0;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('adventure-screen').classList.remove('hidden');
+  nextFlipQuestion();
+}
+
+function nextFlipQuestion() {
+  const questions = flipTopics[currentTopic] || flipTopics.colors;
+  if (currentQIndex >= questions.length) {
+    document.getElementById('feedback').innerHTML = "Wow! You flipped so many ideas today! 🪙✨<br>Pick another topic or come back later!";
+    return;
+  }
+
+  const q = questions[currentQIndex];
+  document.getElementById('question').textContent = q.q;
+  document.getElementById('emoji').textContent = q.emoji;
+  document.getElementById('classic-answer-area').classList.remove('hidden');
+  document.getElementById('flip-section').classList.add('hidden');
+  document.getElementById('feedback').innerHTML = '';
+  document.getElementById('classic-answer').value = '';
+  currentQIndex++;
+}
+
+async function submitClassic() {
+  const answer = document.getElementById('classic-answer').value.trim();
+  if (!answer) return;
+
+  const q = flipTopics[currentTopic][currentQIndex - 1];
+  const feedback = document.getElementById('feedback');
+  feedback.innerHTML = "Great answer! 🌟 Now flipping...";
+
+  const flipPrompt = `You are Octo, a kind, playful octopus friend for a child 3-6 years old.
+After they answered "${answer}" to "${q.q}" (classic answer: ${q.classic}),
+ask ONE short, fun "what if" or "how else" question to explore the other side.
+1 sentence only + emoji. Very positive, curious, no judgment. Example: "What if the sky was green? Would birds still fly? ☁️✨"`;
+
+  const flipText = await callGrok(flipPrompt, 50);
+  document.getElementById('flip-text').textContent = flipText;
+  document.getElementById('classic-answer-area').classList.add('hidden');
+  document.getElementById('flip-section').classList.remove('hidden');
+  feedback.innerHTML = '';
+}
+
+function submitFlipResponse() {
+  const response = document.getElementById('response-input').value.trim();
+  if (response.length < 3) {
+    alert("Tell Octo a little more — what do you think? 🦑");
+    return;
+  }
+
+  document.getElementById('feedback').innerHTML = "I LOVE how you thought about that! 🪙✨<br>Your ideas are super special.";
+  document.getElementById('response-input').value = '';
+  document.getElementById('flip-section').classList.add('hidden');
+
+  setTimeout(nextFlipQuestion, 2500);
+}
+
+function backToStart() {
+  stopListening();
+  document.getElementById('adventure-screen').classList.add('hidden');
+  document.getElementById('start-screen').classList.remove('hidden');
+  currentQIndex = 0;
+  document.getElementById('feedback').innerHTML = '';
+}
+</script>
+</body>
+</html>

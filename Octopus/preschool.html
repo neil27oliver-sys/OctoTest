@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pre-School Adventure! 🦋</title>
+  <style>
+    :root {
+      --sea-dark: #0a1f3d;
+      --octo-orange: #ff6b00;
+      --happy-cyan: #00ffcc;
+      --curious-yellow: #ffd700;
+      --sky-blue: #00d4ff;
+    }
+
+    body { 
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: var(--sea-dark);
+      color: white;
+      margin: 0; padding: 0; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+    }
+
+    nav { 
+      width: 100%;
+      background: #000; padding: 1rem 0; display: flex; justify-content: center;
+      border-bottom: 3px solid var(--sky-blue); position: sticky; top: 0; z-index: 1000;
+    }
+    nav a { color: white; text-decoration: none; margin: 0 15px; font-weight: 900; text-transform: uppercase; }
+
+    #main { 
+      padding: 15px; 
+      max-width: 450px; 
+      width: 95%;
+      margin: 0 auto; 
+    }
+
+    h1 { color: var(--octo-orange); text-shadow: 2px 2px var(--curious-yellow); font-size: 2.2em; text-align: center; }
+    
+    select {
+      font-size: 18px; padding: 12px; margin: 10px 0; border-radius: 15px;
+      width: 100%; background: white; color: #000; border: 3px solid var(--happy-cyan);
+    }
+
+    .quiz-menu, .quiz, #scoresheet, .content-section { 
+      background: rgba(255, 255, 255, 0.05); 
+      border: 3px solid var(--happy-cyan); 
+      border-radius: 25px; padding: 20px; margin: 15px 0; 
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5); text-align: center;
+    }
+
+    button {
+      font-size: 18px; padding: 12px 20px; margin: 10px; border-radius: 30px;
+      border: 3px solid var(--happy-cyan); background: rgba(255,255,255,0.1); 
+      color: white; cursor: pointer; font-family: inherit;
+    }
+
+    .option {
+      display: block; width: 100%; margin: 10px 0; padding: 15px;
+      background: rgba(255, 255, 255, 0.1); border: 2px solid var(--octo-orange);
+      border-radius: 20px; font-size: 20px; color: white; cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .current-word { font-size: 30px; font-weight:bold; color:#ff6b6b; letter-spacing:10px; padding:10px; border-bottom:3px dashed #ff9a9e; min-height:45px; margin-bottom: 20px;}
+
+    #input-bank button {
+        background: var(--sky-blue);
+        color: var(--sea-dark);
+        font-weight: bold;
+        min-width: 50px;
+    }
+
+    .bottom-buttons { margin: 20px 0; display: flex; justify-content: center; gap: 10px; }
+  </style>
+</head>
+<body>
+
+<nav><a href="index.html">Home</a>
+    <a href="flip.html">Flip Side Adventures</a>
+</nav>
+
+<div id="main">
+    <h1>Pre-School Adventure! 🦋</h1>
+    <div id="greeting" style="text-align: center;">Hi Little Explorer!</div>
+
+    <div id="menu-area" class="quiz-menu">
+      <h2>Ready for a Lesson?</h2>
+      <select id="lesson">
+        <option value="family">Family 👨‍👩‍👧‍👦</option>
+        <option value="colors">Colors 🎨</option>
+        <option value="numbers">Numbers (1-10) 🔢</option>
+        <option value="alphabet">Alphabet (A-Z) 🔤</option>
+        <option value="shapes">Shapes 📐</option>
+        <option value="animals">Animals 🦁</option>
+        <option value="cleanliness">Cleanliness 🧼</option>
+        <option value="name_objects">Name the Objects 🖼️</option>
+        <option value="add_subtract">Add & Subtract ➕➖</option>
+        <option value="multiply_divide">Multiply & Divide ✖️➗</option>
+        <option value="spell_word">Spell the Word 🔤</option>
+        <option value="speak_word">Speak the Word 🗣️</option>
+      </select>
+      <br>
+      <button onclick="startQuiz()" style="background:var(--octo-orange); width: 80%;">Launch Adventure! 🚀</button>
+    </div>
+
+    <div id="quiz-container" class="quiz" style="display:none;">
+      <div id="question-text" style="font-size: 1.4em; margin-bottom: 10px;"></div>
+      
+      <div id="img-area" style="font-size: 70px; margin: 15px 0;"></div>
+
+      <div id="word-adventure-ui" style="display:none;">
+          <button onclick="playTargetVoice()" style="background:var(--curious-yellow); color:black; font-size:22px;">🔊 Listen</button>
+          <div id="display-word" class="current-word"></div>
+          <div id="input-bank" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+      </div>
+
+      <div id="options-area"></div>
+      
+      <div id="feedback" style="margin: 15px; font-size: 1.2em; font-weight: bold;"></div>
+      
+      <button id="nextBtn" style="display:none; background: var(--happy-cyan); color: black;" onclick="nextQuestion()">Next Question →</button>
+      <br>
+      <button onclick="exitToMenu()" style="border-color: #ff4444; font-size: 14px; margin-top: 10px;">Stop Adventure</button>
+    </div>
+
+    <div id="scoresheet">
+      <h3>Adventure Scores 🏆</h3>
+      <div id="scoreTable" style="font-size: 0.9em;"></div>
+    </div>
+
+    <div class="bottom-buttons">
+      <button style="background:var(--curious-yellow); color:black;" onclick="showSection('story')">Read Story ✨</button>
+      <button style="background:var(--octo-orange);" onclick="showSection('music')">Play Music 🎶</button>
+    </div>
+
+    <div id="story-section" class="content-section" style="display:none;">
+      <h3>The Little Star's Big Hug</h3>
+      <p id="story-text" style="text-align: left; font-size: 0.95em;">"Look up, little one! Can you see the North Star shining bright? It stands still, right in the center of the night sky, like a brave, tiny anchor. Now look at all the thousands of stars dancing around it! The North Star is like you—unique and special. And all the stars spinning around it are all the people in the world! They might be close, or they might be far away, speaking different words and laughing different laughs. But here's the secret: No matter how far apart they move, they are always connected to the same center, the same sky. That North Sky hug reminds us that every person, every family, and every friend, no matter where they are, is part of our big, beautiful human circle. We all shine together!"</p>
+      <button onclick="readStoryAloud()" style="background:var(--happy-cyan); color:black;">🔊 Read to Me</button>
+      <button onclick="closeSections()">Close</button>
+    </div>
+
+    <div id="music-section" class="content-section" style="display:none;">
+      <h3>Adventure Tunes</h3>
+      <audio id="player" controls style="width:100%;">
+        <source src="assets/Twinkle, Twinkle, Little Explorer.mp3" type="audio/mpeg">
+      </audio>
+      <button onclick="closeSections()">Close</button>
+    </div>
+</div>
+
+<script>
+    let currentQuiz = [], qIdx = 0, score = 0, currentMode = '';
+    let targetWord = '', attempt = '';
+
+    const library = {
+        family: [
+            {q:"Who is this?", img:"👨‍👩‍👧‍👦", opts:["Family","Friends","School"], ans:"Family"},
+            {q:"Who loves you?", img:"❤️", opts:["Mother","Father","Teacher"], ans:"Mother"},
+            {q:"Your home team?", img:"🏠", opts:["Father","Family","Neighbors"], ans:"Family"},
+            {q:"Helps at home?", img:"🧹", opts:["Sister","Stranger","Animal"], ans:"Sister"},
+            {q:"Big hug from?", img:"🤗", opts:["Grandma","Rain","Book"], ans:"Grandma"}
+        ],
+        colors: [
+            {q:"What color is this?", img:"🔴", opts:["Red","Blue","Green"], ans:"Red"},
+            {q:"Sky color?", img:"🔵", opts:["Yellow","Blue","Black"], ans:"Blue"},
+            {q:"Grass color?", img:"🟢", opts:["Red","Green","Purple"], ans:"Green"},
+            {q:"Sun color?", img:"🟡", opts:["Yellow","Pink","Gray"], ans:"Yellow"},
+            {q:"Banana color?", img:"🍌", opts:["Blue","Yellow","Red"], ans:"Yellow"}
+        ],
+        numbers: [
+            {q:"How many fingers on one hand?", opts:["3","5","10"], ans:"5"},
+            {q:"How many apples here?", img:"🍎🍎🍎", opts:["1","2","3"], ans:"3"},
+            {q:"1 + 1 = ?", opts:["1","2","3"], ans:"2"},
+            {q:"5 - 2 = ?", opts:["2","3","4"], ans:"3"},
+            {q:"How many toes on two feet?", opts:["5","10","15"], ans:"10"}
+        ],
+        alphabet: [
+            {q:"Starts with A?", img:"🍎", opts:["A","B","C"], ans:"A"},
+            {q:"B is for?", img:"🐝", opts:["Ball","Bee","Cat"], ans:"Bee"},
+            {q:"C like?", img:"🐱", opts:["Dog","Cat","Bird"], ans:"Cat"},
+            {q:"D for?", img:"🐶", opts:["Dog","Elephant","Fish"], ans:"Dog"},
+            {q:"What comes after Y?", opts:["X","Z","A"], ans:"Z"}
+        ],
+        shapes: [
+            {q:"Round shape?", img:"⚽", opts:["Circle","Square","Triangle"], ans:"Circle"},
+            {q:"Box shape?", img:"📦", opts:["Circle","Square","Star"], ans:"Square"},
+            {q:"Pizza slice shape?", img:"🍕", opts:["Triangle","Rectangle","Oval"], ans:"Triangle"},
+            {q:"Door shape?", img:"🚪", opts:["Square","Circle","Diamond"], ans:"Square"},
+            {q:"Star shape?", img:"⭐", opts:["Star","Heart","Moon"], ans:"Star"}
+        ],
+        animals: [
+            {q:"Meow sound?", img:"🐱", opts:["Dog","Cat","Bird"], ans:"Cat"},
+            {q:"Roar big?", img:"🦁", opts:["Lion","Rabbit","Fish"], ans:"Lion"},
+            {q:"Woof woof!", img:"🐶", opts:["Cat","Dog","Horse"], ans:"Dog"},
+            {q:"Swims in sea?", img:"🐟", opts:["Fish","Elephant","Bird"], ans:"Fish"},
+            {q:"Hops fast?", img:"🐰", opts:["Rabbit","Snake","Cow"], ans:"Rabbit"}
+        ],
+        cleanliness: [
+            {q:"Brush your?", img:"🪥", opts:["Teeth","Hair","Shoes"], ans:"Teeth"},
+            {q:"Wash hands with?", img:"🧼", opts:["Soap","Candy","Toys"], ans:"Soap"},
+            {q:"After bath?", img:"🧼", opts:["Run","Dry off","Sleep"], ans:"Dry off"},
+            {q:"Clean up toys?", img:"🧸", opts:["Leave out","Put away","Hide"], ans:"Put away"},
+            {q:"Wash hands before?", img:"🍲", opts:["Bed","Eating","TV"], ans:"Eating"}
+        ],
+        name_objects: [
+            {q:"What is this?", img:"🍎", opts:["Apple","Banana","Car"], ans:"Apple"},
+            {q:"Fluffy friend?", img:"🐶", opts:["Dog","Tree","Book"], ans:"Dog"},
+            {q:"Yellow fruit?", img:"🍌", opts:["Apple","Banana","Milk"], ans:"Banana"},
+            {q:"Read me?", img:"📖", opts:["Book","Shoes","Ball"], ans:"Book"},
+            {q:"Quack quack!", img:"🦆", opts:["Duck","Cow","Car"], ans:"Duck"}
+        ],
+        add_subtract: [
+            {q:"1 + 1 = ?", opts:["1","2","3"], ans:"2"},
+            {q:"3 - 1 = ?", opts:["2","3","4"], ans:"2"},
+            {q:"2 + 3 = ?", opts:["4","5","6"], ans:"5"},
+            {q:"5 - 3 = ?", opts:["1","2","3"], ans:"2"},
+            {q:"4 + 4 = ?", opts:["6","8","10"], ans:"8"}
+        ],
+        multiply_divide: [
+            {q:"2 × 2 = ?", opts:["2","4","6"], ans:"4"},
+            {q:"6 ÷ 2 = ?", opts:["1","3","5"], ans:"3"},
+            {q:"3 × 3 = ?", opts:["6","9","12"], ans:"9"},
+            {q:"8 ÷ 4 = ?", opts:["2","3","4"], ans:"2"},
+            {q:"1 × 5 = ?", opts:["1","5","10"], ans:"5"}
+        ]
+    };
+
+    function generateSpellQuizzes(){
+        const qList = [];
+        const shortWordList = ['CAT','DOG','SUN','BAT','HAT','MAT','RAT','LOG','BIG','PIG'];
+        for (let i=0;i<5;i++){
+            const word = shortWordList[Math.floor(Math.random()*shortWordList.length)];
+            const letters = word.split('');
+            const distractors = [];
+            while (distractors.length < 3){
+                const randLet = String.fromCharCode(65+Math.floor(Math.random()*26));
+                if (!letters.includes(randLet) && !distractors.includes(randLet)) distractors.push(randLet);
+            }
+            let shuffled = [...letters, ...distractors].sort(()=>Math.random()-0.5);
+            qList.push({ q:`Spell the word:`, target: word, letters: shuffled });
+        }
+        return qList;
+    }
+
+    function generateSpeakQuizzes(){
+        const qList=[];
+        const fullWordList = ['Apple','Dog','Ball','Cat','Sun','Tree','Book','Car','House','Baby'];
+        for(let i=0;i<5;i++){
+            const word = fullWordList[Math.floor(Math.random()*fullWordList.length)];
+            let opts=[word];
+            while (opts.length<3){
+                const rand = fullWordList[Math.floor(Math.random()*fullWordList.length)];
+                if (!opts.includes(rand)) opts.push(rand);
+            }
+            opts.sort(()=>Math.random()-0.5);
+            qList.push({ q:`What word did I say?`, target: word, opts: opts, ans: word });
+        }
+        return qList;
+    }
+
+    function startQuiz(){
+        currentMode = document.getElementById('lesson').value;
+        if (library[currentMode]) {
+            currentQuiz = [...library[currentMode]];
+        } else if (currentMode === 'spell_word') {
+            currentQuiz = generateSpellQuizzes();
+        } else if (currentMode === 'speak_word') {
+            currentQuiz = generateSpeakQuizzes();
+        }
+
+        qIdx = 0; score = 0;
+        document.getElementById('menu-area').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = currentQuiz[qIdx];
+        const optsArea = document.getElementById('options-area');
+        const wordUI = document.getElementById('word-adventure-ui');
+        const feedback = document.getElementById('feedback');
+        
+        feedback.textContent = '';
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('question-text').textContent = q.q;
+        document.getElementById('img-area').textContent = q.img || '';
+        optsArea.innerHTML = '';
+        wordUI.style.display = 'none';
+
+        if (currentMode === 'spell_word') {
+            wordUI.style.display = 'block';
+            targetWord = q.target;
+            attempt = "";
+            document.getElementById('display-word').textContent = "_ ".repeat(targetWord.length);
+            const bank = document.getElementById('input-bank');
+            bank.innerHTML = '';
+            q.letters.forEach(let => {
+                const b = document.createElement('button');
+                b.textContent = let;
+                b.onclick = () => {
+                    if (attempt.length < targetWord.length) {
+                        attempt += let;
+                        document.getElementById('display-word').textContent = attempt;
+                        if (attempt.length === targetWord.length) validate(attempt, targetWord);
+                    }
+                };
+                bank.appendChild(b);
+            });
+        } else if (currentMode === 'speak_word') {
+            wordUI.style.display = 'block';
+            targetWord = q.target;
+            document.getElementById('display-word').textContent = "???";
+            document.getElementById('input-bank').innerHTML = '';
+            
+            q.opts.forEach(o => {
+                const b = document.createElement('div');
+                b.className = 'option';
+                b.textContent = o;
+                b.onclick = () => validate(o, q.ans);
+                optsArea.appendChild(b);
+            });
+            setTimeout(playTargetVoice, 600);
+        } else {
+            q.opts.forEach(o => {
+                const b = document.createElement('div');
+                b.className = 'option';
+                b.textContent = o;
+                b.onclick = () => validate(o, q.ans);
+                optsArea.appendChild(b);
+            });
+        }
+    }
+
+    function validate(user, correct) {
+        const f = document.getElementById('feedback');
+        if (user.toUpperCase() === correct.toUpperCase()) {
+            f.textContent = "YES! Super Star! 🌟";
+            f.style.color = "var(--happy-cyan)";
+            score++;
+        } else {
+            f.textContent = "Try again! It was " + correct + " ❤️";
+            f.style.color = "#ff4444";
+        }
+        document.getElementById('nextBtn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        qIdx++;
+        if (qIdx < currentQuiz.length) loadQuestion();
+        else {
+            const modeName = currentMode.replace('_',' ').toUpperCase();
+            document.getElementById('scoreTable').innerHTML += `<div>${modeName}: ${score}/${currentQuiz.length}</div>`;
+            exitToMenu();
+        }
+    }
+
+    function exitToMenu() {
+        document.getElementById('menu-area').style.display = 'block';
+        document.getElementById('quiz-container').style.display = 'none';
+        window.speechSynthesis.cancel();
+    }
+
+    function showSection(id) {
+        closeSections();
+        document.getElementById(id + '-section').style.display = 'block';
+    }
+
+    function closeSections() {
+        document.getElementById('story-section').style.display = 'none';
+        document.getElementById('music-section').style.display = 'none';
+        window.speechSynthesis.cancel();
+    }
+
+    function playTargetVoice() {
+        const m = new SpeechSynthesisUtterance(targetWord);
+        m.rate = 0.8;
+        window.speechSynthesis.speak(m);
+    }
+
+    function readStoryAloud() {
+        const t = document.getElementById('story-text').textContent;
+        const m = new SpeechSynthesisUtterance(t);
+        m.rate = 0.9;
+        window.speechSynthesis.speak(m);
+    }
+</script>
+</body>
+</html>

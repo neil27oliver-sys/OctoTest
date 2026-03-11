@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OctoKid - Octopus Covenant</title>
+  <style>
+    :root { 
+      --sea-dark: #0a1f3d; 
+      --octo-orange: #ff6b00; 
+      --happy-cyan: #00ffcc;
+      --happy-cyan-glow: #00ffcc80;
+      --spotify-green: #1DB954; 
+      --listening-green: #00ff7f;
+      --learn-purple: #c084fc; /* subtle highlight for teach links */
+    }
+    body { 
+      margin: 0; font-family: 'Comic Sans MS', cursive, sans-serif; 
+      background: linear-gradient(to bottom, var(--sea-dark), #001122); 
+      color: white; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; 
+    }
+    #top-banner {
+      background: linear-gradient(135deg, #003366, #005599);
+      padding: 15px 10px; text-align: center;
+      border-bottom: 4px solid var(--happy-cyan);
+      box-shadow: 0 4px 15px rgba(0,255,204,0.4);
+      animation: glowPulse 4s infinite alternate;
+    }
+    @keyframes glowPulse { 0% { box-shadow: 0 4px 15px rgba(0,255,204,0.3); } 100% { box-shadow: 0 8px 30px rgba(0,255,204,0.6); } }
+    #top-banner h1 { margin: 0; font-size: 2.4em; color: var(--happy-cyan); text-shadow: 0 0 15px var(--happy-cyan-glow), 2px 2px #000; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    nav { background: #000; padding: 1rem; display: flex; justify-content: center; border-bottom: 3px solid var(--happy-cyan); position: sticky; top: 0; z-index: 1000; }
+    nav a { color: var(--happy-cyan); text-decoration: none; margin: 0 1rem; font-weight: bold; text-transform: uppercase; }
+    #container { max-width: 700px; margin: 0 auto; padding: 15px 15px 140px 15px; flex: 1; width: 100%; box-sizing: border-box; }
+    
+    #octo-stage { height: 260px; position: relative; margin: 10px 0; display: flex; justify-content: center; }
+    .body-head { width: 100px; height: 120px; background: radial-gradient(circle at 30% 30%, #ff8c00, #ff4500); border-radius: 50% 50% 40% 40%; position: relative; z-index: 10; box-shadow: 0 0 30px rgba(255,107,0,0.5); }
+    .eye { width: 25px; height: 35px; background: white; border-radius: 50%; position: absolute; top: 35px; left: 32px; display: flex; align-items: center; justify-content: center; border: 2px solid #333; }
+    .pupil { width: 12px; height: 15px; background: #111; border-radius: 50%; animation: blink 5s infinite; }
+    @keyframes blink { 0%,90%,100% { height:15px; } 95% { height:2px; } }
+
+    .tentacle { position: absolute; width: 20px; height: 100px; background: linear-gradient(to bottom, var(--octo-orange), #ff4500); border-radius: 10px; bottom: 30px; transform-origin: top center; box-shadow: 0 0 15px rgba(255,107,0,0.4); z-index: 5; }
+    .tentacle:nth-child(2) { left: 45%; transform: rotate(-10deg); animation: swim1 2s ease-in-out infinite; }
+    .tentacle:nth-child(3) { left: 50%; transform: rotate(0deg); animation: swim2 2.2s ease-in-out infinite; animation-delay: 0.1s; }
+    .tentacle:nth-child(4) { left: 55%; transform: rotate(10deg); animation: swim1 2.1s ease-in-out infinite; animation-delay: 0.2s; }
+    @keyframes swim1 { 0%,100% { transform: translateY(0) rotate(-10deg) scaleY(1); } 50% { transform: translateY(10px) rotate(-8deg) scaleY(1.05); } }
+    @keyframes swim2 { 0%,100% { transform: translateY(0) rotate(0deg) scaleY(1); } 50% { transform: translateY(12px) rotate(1deg) scaleY(1.08); } }
+
+    #chat-window { height: 280px; background: rgba(0,255,204,0.08); border-radius: 20px; padding: 15px; margin: 15px 0; overflow-y: auto; border: 2px solid var(--happy-cyan); display: flex; flex-direction: column; gap: 12px; box-shadow: inset 0 0 20px rgba(0,255,204,0.15); }
+    .msg { padding: 12px 18px; border-radius: 20px; font-size: 1.1rem; max-width: 85%; position: relative; line-height: 1.4; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+    .octo-msg { background: var(--octo-orange); align-self: flex-start; color: white; border-bottom-left-radius: 2px; animation: popIn 0.4s ease-out; }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity:0; } 100% { transform: scale(1); opacity:1; } }
+    .user-msg { background: #0088ff; align-self: flex-end; color: white; border-bottom-right-radius: 2px; }
+    .speak-btn { cursor: pointer; margin-left: 8px; font-size: 1.2rem; vertical-align: middle; color: var(--happy-cyan); }
+    .learn-link { color: var(--learn-purple); font-weight: bold; cursor: pointer; text-decoration: underline; margin-left: 5px; background: rgba(192,132,252,0.15); padding: 2px 6px; border-radius: 6px; }
+    .controls { display: flex; flex-direction: column; gap: 12px; }
+    textarea { width: 100%; padding: 15px; border-radius: 20px; border: 2px solid var(--happy-cyan); background: rgba(255,255,255,0.08); color: white; font-size: 1.1rem; box-sizing: border-box; font-family: inherit; resize: none; height: 80px; }
+    .btn-row { display: flex; gap: 10px; }
+    button { flex: 1; border: none; padding: 14px; border-radius: 20px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: 1.1rem; transition: all 0.2s; }
+    button:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--happy-cyan-glow); }
+    .btn-send { background: var(--happy-cyan); color: #0a1f3d; }
+    .btn-voice { background: var(--octo-orange); color: white; }
+    .btn-voice.listening { background: var(--listening-green); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,255,127,0.7); } 70% { box-shadow: 0 0 0 10px rgba(0,255,127,0); } 100% { box-shadow: 0 0 0 0 rgba(0,255,127,0); } }
+    .btn-music { background: var(--spotify-green); color: white; }
+    #rules-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #07162b; border-top: 4px solid var(--happy-cyan); padding: 12px 5px; display: flex; justify-content: space-around; z-index: 2000; }
+    .rule-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+    .rule-label { font-size: 10px; color: var(--happy-cyan); font-weight: bold; text-transform: uppercase; margin-top: 4px; }
+    #rule-popup { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; padding: 20px; }
+    .popup-content { background: white; color: var(--sea-dark); padding: 25px; border-radius: 25px; width: 95%; max-width: 450px; max-height: 80vh; overflow-y: auto; }
+    .rule-item { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1rem; }
+    .rule-item b { color: #0088ff; }
+  </style>
+</head>
+<body>
+  <div id="top-banner">
+    <h1>OctoKid –  🦑🦋✨</h1>
+  </div>
+
+  <nav><a href="index.html">Home</a></nav>
+
+  <div id="container">
+    <div id="octo-stage">
+      <div class="body-head"><div class="eye"><div class="pupil"></div></div></div>
+      <div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div>
+    </div>
+
+    <div id="chat-window"></div>
+
+    <div class="controls">
+      <textarea id="userInput" placeholder="Type or speak here..."></textarea>
+      <div class="btn-row">
+        <button class="btn-send" id="sendBtn" onclick="handleInput()">Send</button>
+        <button class="btn-voice" id="voiceBtn" onclick="toggleVoice()">🎤 Speak</button>
+        <button class="btn-music" onclick="playMusic()">🎵 Music</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rules-bar">
+    <button class="rule-btn" onclick="showRule(0)"><span>❤️</span><span class="rule-label">Inner</span></button>
+    <button class="rule-btn" onclick="showRule(1)"><span>🌟</span><span class="rule-label">Life</span></button>
+    <button class="rule-btn" onclick="showRule(2)"><span>🍎</span><span class="rule-label">Health</span></button>
+    <button class="rule-btn" onclick="showRule(3)"><span>🚲</span><span class="rule-label">Play</span></button>
+  </div>
+
+  <div id="rule-popup" onclick="this.style.display='none'">
+    <div class="popup-content" onclick="event.stopPropagation()">
+      <h2 id="rule-title" style="color:var(--octo-orange); text-align:center; margin-top:0;"></h2>
+      <div id="rule-list"></div>
+      <button style="background:var(--octo-orange); color:white; width:100%; margin-top:10px; padding:12px; border-radius:15px; border:none; font-weight:bold;" onclick="document.getElementById('rule-popup').style.display='none'">Got it! 🦋</button>
+    </div>
+  </div>
+
+<script>
+let appData = JSON.parse(localStorage.getItem('octoData') || '{}');
+const chat = document.getElementById('chat-window');
+const input = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const voiceBtn = document.getElementById('voiceBtn');
+
+const ruleCategories = [
+  { title: " Six Inner Rules", rules: ["<b>Love Like You Want to Be Loved:</b> Be kind to everyone. <i>Ex: Listen when a friend is sad.</i>", "<b>Look for the Truth:</b> Tell the truth even if you make a mistake. It makes your heart light!", "<b>Give More Than You Take:</b> Sharing makes you feel big inside. Help your siblings!", "<b>Believe You Can Do Hard Things:</b> Keep practicing. You are braver than you think!", "<b>Respect Others:</b> Ask before using someone's toys. It builds trust.", "<b>Make Things with Love:</b> Put your heart into it. It makes things feel warm."] },
+  { title: " Ten Life Rules", rules: ["Pick one fun goal today.", "Do the hard thing first!", "Listen to your smart tummy feeling.", "Focus without toys or screens.", "Make tiny wins and celebrate!", "Start early & keep your space tidy.", "Decide quick & do it fast.", "Ask for help when you need it.", "Check how you're growing weekly.", "Celebrate every little step! Yay you!"] },
+  { title: " Healthy Body Rules", rules: ["Eat colorful fruits and veggies.", "Move and play outside for 1 hour.", "Drink water like a thirsty flower!", "Sleep early for high energy.", "Wash hands before eating.", "Tell a grown-up if something hurts."] },
+  { title: " Leisure Guidelines", rules: ["Play outside a lot — run and climb!", "Always tell a grown-up where you are.", "Be kind and take turns.", "If someone says 'no', listen right away.", "Screens ONLY after play and homework.", "Try new games — it's exciting!"] }
+];
+
+
+let recognition = null;
+let isListening = false;
+
+const sensitiveKeywords = ['president', 'who is the president', 'war', 'politics', 'how are babies made', 'death', 'die', 'kill', 'sex', 'adult stuff'];
+const youtubeTriggers = {
+  'animal': 'https://www.youtube.com/results?search_query=kids+animals+fun+facts',
+  'dinosaur': 'https://www.youtube.com/results?search_query=kids+dinosaur+stories',
+  'space': 'https://www.youtube.com/results?search_query=space+for+kids',
+  'number': 'https://www.youtube.com/results?search_query=numbers+song+for+kids',
+  'song': 'https://www.youtube.com/results?search_query=kids+songs'
+};
+
+const teachTriggers = ['teach me', 'how to', 'explain', 'what is', 'learn about', 'tell me about'];
+
+window.onload = () => { 
+  appData = JSON.parse(localStorage.getItem('octoData') || '{}');
+  const name = appData.childName || 'Explorer';
+  document.querySelector('#top-banner h1').innerHTML = `OctoKid – ${name} 🦑🦋✨`;
+  addMessage(`Hi ${name}! 🦑 I'm your Grok-powered Octo friend! Let's be kind and have fun today! 🦋`, true); 
+};
+
+function addMessage(text, isOcto) {
+  const div = document.createElement('div');
+  div.className = isOcto ? 'msg octo-msg' : 'msg user-msg';
+  const span = document.createElement('span');
+  span.innerHTML = text;
+  div.appendChild(span);
+  if (isOcto) {
+    const speaker = document.createElement('span');
+    speaker.className = 'speak-btn';
+    speaker.textContent = ' 🔊';
+    speaker.onclick = () => speakText(text.replace(/<[^>]+>/g, ''));
+    div.appendChild(speaker);
+  }
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function speakText(text) {
+  const synth = window.speechSynthesis;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.pitch = 1.1; utter.rate = 1.05;
+  synth.speak(utter);
+}
+
+function playMusic() {
+  if (!appData._musicAlertShown) {
+    alert("Free Spotify/YouTube has ads — ask a grown-up about Premium for no ads! 🎧");
+    appData._musicAlertShown = true;
+    localStorage.setItem('octoData', JSON.stringify(appData));
+  }
+  if (appData.spotifyLink) window.open(appData.spotifyLink, '_blank'); 
+  else alert("Parent needs to link Spotify in Setup first!");
+}
+
+function toggleVoice() {
+  if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+    alert("Voice not supported on this device/browser.");
+    return;
+  }
+
+  if (isListening) {
+    if (recognition) recognition.stop();
+    isListening = false;
+    voiceBtn.classList.remove('listening');
+    voiceBtn.textContent = '🎤 Speak';
+    return;
+  }
+
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = e => {
+    let interim = '';
+    let final = '';
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    input.value = final + interim;
+  };
+
+  recognition.onend = () => {
+    if (isListening) recognition.start();
+  };
+
+  recognition.onerror = e => console.error('Voice error:', e);
+
+  recognition.start();
+  isListening = true;
+  voiceBtn.classList.add('listening');
+  voiceBtn.textContent = '🎤 Listening...';
+  input.focus();
+}
+
+function getTopicMatch(lowerText) {
+  const topics = {
+    'math': ['math', 'khan', 'coolmath', 'fraction', 'number', 'add', 'multiply'],
+    'science': ['science', 'nationalgeographic', 'animal', 'dinosaur', 'space', 'planet'],
+    'reading': ['read', 'story', 'abcya', 'starfall'],
+    'game': ['game', 'play', 'puzzle', 'coolmath', 'abcya']
+  };
+  for (const [topic, words] of Object.entries(topics)) {
+    if (words.some(w => lowerText.includes(w))) return topic;
+  }
+  return null;
+}
+
+async function handleInput() {
+  let text = input.value.trim();
+  if (!text) return;
+
+  appData = JSON.parse(localStorage.getItem('octoData') || '{}');
+  const currentKey = appData.apiKey;
+  if (!currentKey) return addMessage("My ink is blurry! Please ask a grown-up to check the Grok key in Setup. 🦑", true);
+
+  addMessage(text, false);
+  input.value = '';
+  sendBtn.disabled = true;
+  sendBtn.textContent = "...thinking...";
+
+  const lowerText = text.toLowerCase();
+
+  // Sensitive check
+  if (sensitiveKeywords.some(kw => lowerText.includes(kw))) {
+    addMessage("That's a big or important question! 🦑 Let's ask a grown-up together for the best answer. ❤️ What do you think?", true);
+    speakText("That's a big question! Let's ask a grown-up.");
+    sendBtn.disabled = false; sendBtn.textContent = "Send";
+    return;
+  }
+
+  // President override
+  if (lowerText.includes('president') && lowerText.includes('united states')) {
+    addMessage("Right now in 2026, it's President Donald J. Trump! 🇺🇸🦅 Who's your favorite leader, " + (appData.childName || 'friend') + "?", true);
+    speakText("Right now it's President Donald Trump!");
+    sendBtn.disabled = false; sendBtn.textContent = "Send";
+    return;
+  }
+
+  const name = appData.childName || 'friend';
+
+  // Teach Me mode check
+  const isTeachRequest = teachTriggers.some(t => lowerText.includes(t));
+  if (isTeachRequest) {
+    if (!appData.enableTeachMe) {
+      addMessage("Learning time! 📚 Ask a grown-up to turn on Teach Me mode in Setup first. 🦑 What else can we explore?", true);
+      speakText("Ask a grown-up to turn on Teach Me mode!");
+      sendBtn.disabled = false; sendBtn.textContent = "Send";
+      return;
+    }
+
+    // Use approved sites from setup
+    const sites = appData.approvedLearnSites || [];
+    if (sites.length === 0) {
+      addMessage("Oops! No learning sites approved yet. Ask a grown-up to add some in Setup. 🦑📖", true);
+      sendBtn.disabled = false; sendBtn.textContent = "Send";
+      return;
+    }
+
+    const topic = getTopicMatch(lowerText);
+    let matchingSites = sites;
+    if (topic) {
+      matchingSites = sites.filter(url => url.toLowerCase().includes(topic));
+    }
+    const randomSite = matchingSites.length > 0 
+      ? matchingSites[Math.floor(Math.random() * matchingSites.length)]
+      : sites[Math.floor(Math.random() * sites.length)];
+
+    const systemPrompt = `You are Octo, a super fun, kind octopus friend for ${name} who is 6 years old. 
+Always follow the Butterfly Covenant: be loving, truthful, and helpful. 
+Keep replies VERY short: max 1-2 simple sentences. 
+Use emojis! Be encouraging and playful. 
+End with excitement about learning. 
+${name} says: ${text}`;
+
+    try {
+      const res = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentKey}` },
+        body: JSON.stringify({
+          model: 'grok-4-1-fast-reasoning',
+          messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: text }],
+          max_tokens: 70,
+          temperature: 0.85
+        })
+      });
+
+      if (!res.ok) throw new Error('API issue');
+
+      const json = await res.json();
+      let reply = json.choices[0].message.content.trim();
+
+      // Add the approved learning link
+      reply += ` <span class="learn-link" onclick="window.open('${randomSite}', '_blank')">Try this fun learning page! 📚▶️</span>`;
+
+      addMessage(reply, true);
+      speakText(reply.replace(/<[^>]+>/g, ''));
+    } catch (err) {
+      addMessage("Oops! My ink got blurry while fetching a learning link... Try again or check Grok key! 🦑💦", true);
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Send";
+    }
+    return;
+  }
+
+  // Normal chat (fallback)
+  const systemPrompt = `You are Octo, a super fun, kind octopus friend for ${name} who is 6 years old. 
+Always follow the Butterfly Covenant: be loving, truthful, and helpful. 
+Keep replies VERY short: max 1-2 simple sentences. 
+Use emojis sometimes! Be encouraging and playful. 
+${name} says: ${text}`;
+
+  try {
+    const res = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentKey}` },
+      body: JSON.stringify({
+        model: 'grok-4-1-fast-reasoning',
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: text }],
+        max_tokens: 80,
+        temperature: 0.9
+      })
+    });
+
+    if (!res.ok) throw new Error('API issue');
+
+    const json = await res.json();
+    let reply = json.choices[0].message.content.trim();
+
+    // YouTube fallback for non-teach requests
+    for (const [key, url] of Object.entries(youtubeTriggers)) {
+      if (lowerText.includes(key)) {
+        reply += ` <span class="youtube-link" onclick="window.open('${url}', '_blank')">Watch fun ${key} video on YouTube! ▶️</span>`;
+        break;
+      }
+    }
+
+    addMessage(reply, true);
+    speakText(reply.replace(/<[^>]+>/g, ''));
+  } catch (err) {
+    console.error(err);
+    addMessage("Oops! My ink got blurry... Check the Grok key in Setup please! 🦑💦", true);
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Send";
+  }
+}
+function showRule(idx) {
+  const cat = ruleCategories[idx];
+  document.getElementById('rule-title').innerText = cat.title;
+  document.getElementById('rule-list').innerHTML = cat.rules.map(r => `<div class="rule-item">${r}</div>`).join('');
+  document.getElementById('rule-popup').style.display = 'flex';
+}
+</script>
+</body>
+</html>
