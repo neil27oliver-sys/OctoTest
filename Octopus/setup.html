@@ -12,7 +12,7 @@
       --muted: #a0a0a0;
       --deep-space: #0f0f1a;
       --card-bg: rgba(35, 72, 70, 0.4);
-      --happy-cyan: #00ffcc;     /* From chat UI for Teach Me highlights */
+      --happy-cyan: #00ffcc;
     }
     body, html { margin:0; padding:0; font-family:'Segoe UI',sans-serif; background: var(--deep-space); color:#e0f2fe; min-height:100vh; }
     .container { max-width:800px; margin:0 auto; padding:40px 20px; }
@@ -54,7 +54,6 @@
     }
     .back-link { display:inline-block; margin-top:30px; color: var(--accent); text-decoration:none; }
 
-    /* Teach Me section highlight */
     .teachme-section { border: 2px dashed var(--happy-cyan); padding: 20px; border-radius: 12px; background: rgba(0,255,204,0.08); margin: 20px 0; }
   </style>
 </head>
@@ -77,6 +76,9 @@
     <h2>Child Profile</h2>
     <label>What should I call you?</label>
     <input type="text" id="childName" placeholder="Explorer Name" />
+
+    <label>Profile Picture (optional):</label>
+    <input type="file" id="childPic" accept="image/*" />
 
     <label>Assistant Name:</label>
     <input type="text" id="assistantName" value="Octo" />
@@ -101,12 +103,12 @@
     <div class="teachme-section">
         <label>
             <input type="checkbox" id="enableTeachMe" checked>
-            Enable "Teach Me" mode – Octo can suggest safe learning links for maths, science, reading, etc.
+            Enable "Teach Me" mode – Octo can suggest safe learning links
         </label>
         <p style="font-size:0.9rem; color:var(--muted); margin:10px 0;">
-            Octo will suggest links only from this approved list when your child asks to learn something.
+            Octo suggests links only from this list when asked to learn.
         </p>
-        <label>Approved Free Educational Websites (one per line – edit as needed):</label>
+        <label>Approved Websites (one per line):</label>
         <textarea id="approvedLearnSites" rows="8">https://www.bbc.co.uk/bitesize
 https://kids.nationalgeographic.com
 https://www.khanacademy.org
@@ -116,28 +118,25 @@ https://www.abcya.com
 https://www.starfall.com
 https://www.pbskids.org</textarea>
         <div class="warning" style="margin-top:15px;">
-            <strong>Parent Note:</strong> These are trusted free sites (mostly no login needed). Some may have small ads. Always supervise your child. Free versions often include ads; consider premium for ad-free if available. Only add sites you trust!
+            <strong>Parent Note:</strong> Trusted free sites. Supervise use. Some have ads.
         </div>
     </div>
 
     <h2>Grok API Key (xAI)</h2>
     <div class="warning">
-        <strong>Parental Action Required:</strong> This key stays on this device only. Without it, smart features are disabled.
+        <strong>Required:</strong> Key stays on device only. No key = no smart features.
     </div>
     <input type="password" id="apiKey" placeholder="xai-..." />
 
     <div class="instructions">
-        <strong>💻 Computer Recommended for this step:</strong><br><br>
-        1. Visit <strong><a href="https://console.x.ai/" target="_blank" style="color:var(--accent)">xAI Console</a></strong>.<br>
-        2. Sign in (may require X Premium in some regions).<br>
-        3. Go to API Keys section → Create new key.<br>
-        4. Copy the key (starts with 'xai-...').<br>
-        5. Paste it above and click <strong>Save Everything</strong>.<br><br>
-        <em>Note:</em> Grok API may require billing setup / credits. Check <a href="https://docs.x.ai/" target="_blank" style="color:var(--accent)">docs.x.ai</a> for models & pricing.
+        <strong>Computer recommended:</strong><br>
+        1. Go to <a href="https://console.x.ai/" target="_blank" style="color:var(--accent)">xAI Console</a><br>
+        2. Sign in → API Keys → Create key<br>
+        3. Copy (starts with 'xai-...') → paste above → Save
     </div>
 
     <button onclick="saveAll()" style="width: 100%; margin-top: 40px; background: var(--accent);">Save Everything & Go Back</button>
-    <div style="text-align: center;">
+    <div style="text-align: center; margin-top:20px;">
         <a href="index.html" class="back-link">← Back to Home (without saving)</a>
     </div>
 </div>
@@ -153,9 +152,8 @@ https://www.pbskids.org</textarea>
         document.getElementById('age').value = data.age || '';
         document.getElementById('spotifyLink').value = data.spotifyLink || '';
         document.getElementById('apiKey').value = data.apiKey || '';
-        document.getElementById('enableTeachMe').checked = data.enableTeachMe !== false; // default true
+        document.getElementById('enableTeachMe').checked = data.enableTeachMe !== false;
         
-        // Load approved sites into textarea (join with newlines)
         if (data.approvedLearnSites && Array.isArray(data.approvedLearnSites)) {
             document.getElementById('approvedLearnSites').value = data.approvedLearnSites.join('\n');
         }
@@ -167,19 +165,20 @@ https://www.pbskids.org</textarea>
     function reviewRule() {
         const val = document.getElementById('newRule').value.trim();
         if(!val) return;
-        document.getElementById('ai-review').textContent = "Consulting the Grok oracle...";
+        document.getElementById('ai-review').textContent = "Consulting Grok...";
         setTimeout(() => {
-            document.getElementById('ai-review').textContent = "Grok Analysis: This rule aligns with safety and kindness principles. Safe to include in the Covenant.";
+            document.getElementById('ai-review').textContent = "Grok: This rule looks kind & safe — good to add!";
             document.getElementById('saveRuleBtn').disabled = false;
         }, 800);
     }
 
     function addRule() {
         const val = document.getElementById('newRule').value.trim();
+        if (!val) return;
         currentRules.push(val);
         document.getElementById('newRule').value = '';
         document.getElementById('saveRuleBtn').disabled = true;
-        document.getElementById('ai-review').textContent = "Rule added to the Covenant!";
+        document.getElementById('ai-review').textContent = "Rule added!";
         renderRules();
     }
 
@@ -200,30 +199,36 @@ https://www.pbskids.org</textarea>
 
     function saveAll() {
         const pin = document.getElementById('pin').value.trim();
-        if (pin.length !== 4) return alert('PIN must be 4 digits.');
+        if (pin && pin.length !== 4) {
+            alert('PIN must be exactly 4 digits (or leave blank).');
+            return;
+        }
 
-        // Get approved sites as array (split lines, trim, filter empty)
         const sitesText = document.getElementById('approvedLearnSites').value.trim();
         const approvedLearnSites = sitesText ? sitesText.split('\n').map(s => s.trim()).filter(s => s) : [];
 
         const data = {
-            pin: pin,
-            childName: document.getElementById('childName').value.trim(),
-            assistantName: document.getElementById('assistantName').value.trim(),
-            age: document.getElementById('age').value,
-            spotifyLink: document.getElementById('spotifyLink').value.trim(),
-            apiKey: document.getElementById('apiKey').value.trim(),
+            pin: pin || '',
+            childName: document.getElementById('childName').value.trim() || 'Explorer',
+            assistantName: document.getElementById('assistantName').value.trim() || 'Octo',
+            age: document.getElementById('age').value || '',
+            spotifyLink: document.getElementById('spotifyLink').value.trim() || '',
+            apiKey: document.getElementById('apiKey').value.trim() || '',
             rules: currentRules,
-            aiModel: "grok-4-1-fast-reasoning",  // Updated to a current strong model
+            aiModel: "grok-4-1-fast-reasoning",
             enableTeachMe: document.getElementById('enableTeachMe').checked,
             approvedLearnSites: approvedLearnSites
         };
 
         const fileInput = document.getElementById('childPic');
-        if (fileInput.files[0]) {
+        if (fileInput.files && fileInput.files[0]) {
             const reader = new FileReader();
-            reader.onload = e => {
+            reader.onload = function(e) {
                 data.childPic = e.target.result;
+                finishSave(data);
+            };
+            reader.onerror = function() {
+                alert("Error reading picture. Saving without it.");
                 finishSave(data);
             };
             reader.readAsDataURL(fileInput.files[0]);
@@ -233,9 +238,15 @@ https://www.pbskids.org</textarea>
     }
 
     function finishSave(data) {
-        localStorage.setItem('octoData', JSON.stringify(data));
-        alert('Covenant Updated! Teach Me mode & approved sites saved. Returning home.');
-        window.location.href = 'index.html';
+        try {
+            localStorage.setItem('octoData', JSON.stringify(data));
+            console.log("Saved data:", data); // debug: open F12 → Console
+            alert('Everything saved successfully! Returning home.');
+            window.location.href = 'index.html';
+        } catch (err) {
+            console.error("Save failed:", err);
+            alert('Save failed! Check browser storage (F12 → Application → Local Storage). Error: ' + err.message);
+        }
     }
 </script>
 
