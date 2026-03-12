@@ -12,7 +12,7 @@
       --happy-cyan-glow: #00ffcc80;
       --spotify-green: #1DB954; 
       --listening-green: #00ff7f;
-      --learn-purple: #c084fc; /* subtle highlight for teach links */
+      --learn-purple: #c084fc;
     }
     body { 
       margin: 0; font-family: 'Comic Sans MS', cursive, sans-serif; 
@@ -118,16 +118,15 @@ const input = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const voiceBtn = document.getElementById('voiceBtn');
 
-const ruleCategories = [
-  { title: " Six Inner Rules", rules: ["<b>Love Like You Want to Be Loved:</b> Be kind to everyone. <i>Ex: Listen when a friend is sad.</i>", "<b>Look for the Truth:</b> Tell the truth even if you make a mistake. It makes your heart light!", "<b>Give More Than You Take:</b> Sharing makes you feel big inside. Help your siblings!", "<b>Believe You Can Do Hard Things:</b> Keep practicing. You are braver than you think!", "<b>Respect Others:</b> Ask before using someone's toys. It builds trust.", "<b>Make Things with Love:</b> Put your heart into it. It makes things feel warm."] },
-  { title: " Ten Life Rules", rules: ["Pick one fun goal today.", "Do the hard thing first!", "Listen to your smart tummy feeling.", "Focus without toys or screens.", "Make tiny wins and celebrate!", "Start early & keep your space tidy.", "Decide quick & do it fast.", "Ask for help when you need it.", "Check how you're growing weekly.", "Celebrate every little step! Yay you!"] },
-  { title: " Healthy Body Rules", rules: ["Eat colorful fruits and veggies.", "Move and play outside for 1 hour.", "Drink water like a thirsty flower!", "Sleep early for high energy.", "Wash hands before eating.", "Tell a grown-up if something hurts."] },
-  { title: " Leisure Guidelines", rules: ["Play outside a lot — run and climb!", "Always tell a grown-up where you are.", "Be kind and take turns.", "If someone says 'no', listen right away.", "Screens ONLY after play and homework.", "Try new games — it's exciting!"] }
-];
-
-
 let recognition = null;
 let isListening = false;
+
+const ruleCategories = [
+  { title: "❤️ Six Inner Rules", rules: ["<b>Love Like You Want to Be Loved:</b> Be kind to everyone. <i>Ex: Listen when a friend is sad.</i>", "<b>Look for the Truth:</b> Tell the truth even if you make a mistake. It makes your heart light!", "<b>Give More Than You Take:</b> Sharing makes you feel big inside. Help your siblings!", "<b>Believe You Can Do Hard Things:</b> Keep practicing. You are braver than you think!", "<b>Respect Others:</b> Ask before using someone's toys. It builds trust.", "<b>Make Things with Love:</b> Put your heart into it. It makes things feel warm."] },
+  { title: "🌟 Ten Life Rules", rules: ["Pick one fun goal today.", "Do the hard thing first!", "Listen to your smart tummy feeling.", "Focus without toys or screens.", "Make tiny wins and celebrate!", "Start early & keep your space tidy.", "Decide quick & do it fast.", "Ask for help when you need it.", "Check how you're growing weekly.", "Celebrate every little step! Yay you!"] },
+  { title: "🍎 Healthy Body Rules", rules: ["Eat colorful fruits and veggies.", "Move and play outside for 1 hour.", "Drink water like a thirsty flower!", "Sleep early for high energy.", "Wash hands before eating.", "Tell a grown-up if something hurts."] },
+  { title: "🚲 Leisure Guidelines", rules: ["Play outside a lot — run and climb!", "Always tell a grown-up where you are.", "Be kind and take turns.", "If someone says 'no', listen right away.", "Screens ONLY after play and homework.", "Try new games — it's exciting!"] }
+];
 
 const sensitiveKeywords = ['president', 'who is the president', 'war', 'politics', 'how are babies made', 'death', 'die', 'kill', 'sex', 'adult stuff'];
 const youtubeTriggers = {
@@ -138,7 +137,7 @@ const youtubeTriggers = {
   'song': 'https://www.youtube.com/results?search_query=kids+songs'
 };
 
-const teachTriggers = ['teach me', 'how to', 'explain', 'what is', 'learn about', 'tell me about'];
+const teachTriggers = ['teach me', 'how to', 'explain', 'what is', 'learn about', 'tell me about', 'show me', 'watch', 'video', 'song', 'dance', 'history', 'maths program'];
 
 window.onload = () => { 
   appData = JSON.parse(localStorage.getItem('octoData') || '{}');
@@ -225,7 +224,7 @@ function toggleVoice() {
 
 function getTopicMatch(lowerText) {
   const topics = {
-    'math': ['math', 'khan', 'coolmath', 'fraction', 'number', 'add', 'multiply'],
+    'math': ['math', 'khan', 'coolmath', 'fraction', 'number', 'add', 'multiply', 'maths program'],
     'science': ['science', 'nationalgeographic', 'animal', 'dinosaur', 'space', 'planet'],
     'reading': ['read', 'story', 'abcya', 'starfall'],
     'game': ['game', 'play', 'puzzle', 'coolmath', 'abcya']
@@ -287,14 +286,32 @@ async function handleInput() {
       return;
     }
 
-    const topic = getTopicMatch(lowerText);
-    let matchingSites = sites;
-    if (topic) {
-      matchingSites = sites.filter(url => url.toLowerCase().includes(topic));
+    let selectedSite = sites[Math.floor(Math.random() * sites.length)];
+
+    // Prefer YouTube Kids for video/song/show requests
+    if (lowerText.includes('video') || lowerText.includes('song') || lowerText.includes('show me') || 
+        lowerText.includes('watch') || lowerText.includes('dance') || lowerText.includes('history') || 
+        lowerText.includes('maths program') || lowerText.includes('adventure') || lowerText.includes('ears') || 
+        lowerText.includes('shoelace') || lowerText.includes('bunny')) {
+      
+      const ytKids = sites.find(s => s.includes('youtubekids.com'));
+      if (ytKids) {
+        const safeQuery = encodeURIComponent(text.replace(/[^a-zA-Z0-9 ]/g, '').trim() + ' for kids');
+        selectedSite = `${ytKids}/search?q=${safeQuery}`;
+      }
     }
-    const randomSite = matchingSites.length > 0 
-      ? matchingSites[Math.floor(Math.random() * matchingSites.length)]
-      : sites[Math.floor(Math.random() * sites.length)];
+
+    // Fallback to topic match if no video intent
+    else {
+      const topic = getTopicMatch(lowerText);
+      let matchingSites = sites;
+      if (topic) {
+        matchingSites = sites.filter(url => url.toLowerCase().includes(topic));
+      }
+      selectedSite = matchingSites.length > 0 
+        ? matchingSites[Math.floor(Math.random() * matchingSites.length)]
+        : sites[Math.floor(Math.random() * sites.length)];
+    }
 
     const systemPrompt = `You are Octo, a super fun, kind octopus friend for ${name} who is 6 years old. 
 Always follow the Butterfly Covenant: be loving, truthful, and helpful. 
@@ -320,8 +337,11 @@ ${name} says: ${text}`;
       const json = await res.json();
       let reply = json.choices[0].message.content.trim();
 
-      // Add the approved learning link
-      reply += ` <span class="learn-link" onclick="window.open('${randomSite}', '_blank')">Try this fun learning page! 📚▶️</span>`;
+      // Add the safe learning link (YouTube Kids preferred when appropriate)
+      const linkText = selectedSite.includes('youtubekids.com') 
+        ? "safe YouTube Kids search" 
+        : "fun learning page";
+      reply += ` <span class="learn-link" onclick="window.open('${selectedSite}', '_blank')">Try this ${linkText}! ▶️📚 (ask grown-up)</span>`;
 
       addMessage(reply, true);
       speakText(reply.replace(/<[^>]+>/g, ''));
@@ -376,6 +396,7 @@ ${name} says: ${text}`;
     sendBtn.textContent = "Send";
   }
 }
+
 function showRule(idx) {
   const cat = ruleCategories[idx];
   document.getElementById('rule-title').innerText = cat.title;
