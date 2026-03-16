@@ -250,6 +250,19 @@ https://www.pbskids.org</textarea>
             alert('Save failed! Check browser storage (F12 → Application → Local Storage). Error: ' + err.message);
         }
     }
+    // Password check on reopen
+window.onload = () => {
+  const data = JSON.parse(localStorage.getItem('octoData') || '{}');
+  if (data.pin) { // If setup is done (PIN exists)
+    const userPin = prompt('Enter your 4-digit PIN to reopen Setup:');
+    if (userPin !== data.pin) {
+      alert('Wrong PIN! Closing Setup.');
+      window.location.href = 'index.html'; // Redirect to home if wrong
+      return;
+    }
+  }
+  // Rest of onload code...
+};
 </script>
 
 </body>
