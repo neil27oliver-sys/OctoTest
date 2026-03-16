@@ -91,18 +91,26 @@
 
   <script>
     const DATA_KEY = 'octoData';
+    // Load app data (contains the PIN and API Key)
     let appData = JSON.parse(localStorage.getItem(DATA_KEY) || '{}');
 
+    // 1. The function the button calls
     function checkPin() {
-      // THE BYPASS: We skip the "if (entered === appData.pin)" check 
-      // and just force the dashboard to show.
-      document.getElementById('pinScreen').style.display = 'none';
-      document.getElementById('dashboardContent').style.display = 'block';
-      loadMetrics();
+      const input = document.getElementById('pinInput').value;
+      const storedPin = appData.pin || "1234"; // Default to 1234 if none set in Setup
+
+      if (input === storedPin) {
+        document.getElementById('pinScreen').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+        loadMetrics(); // Load the data once access is granted
+      } else {
+        alert('Incorrect PIN. Please try again.');
+        document.getElementById('pinInput').value = '';
+      }
     }
 
+    // 2. Load the actual numbers
     function loadMetrics() {
-      // Fetching live counts from local storage (default to 0)
       let pedals = parseInt(localStorage.getItem('pedals') || '0');
       let nudges = parseInt(localStorage.getItem('nudges') || '0');
       
@@ -130,6 +138,7 @@
       }
     }
 
+    // 3. Grok Integration
     async function generateThoughts() {
       const apiKey = appData.apiKey;
       if (!apiKey) {
@@ -155,26 +164,23 @@
             'Authorization': `Bearer ${apiKey}`
           },
           body: JSON.stringify({
-            model: 'grok-4-1-fast-reasoning',  // Strong reasoning model; change if you prefer another (see https://docs.x.ai/developers/models)
+            model: 'grok-2-latest', // Note: using latest stable model
             messages: [
               { role: 'system', content: 'You are Octo, wise and truthful companion.' },
               { role: 'user', content: prompt }
             ],
-            max_tokens: 300,
             temperature: 0.7
           })
         });
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
 
         const result = await response.json();
         const text = result.choices[0].message.content.trim();
         document.getElementById('thoughtsOutput').textContent = text;
       } catch (err) {
         console.error(err);
-        document.getElementById('thoughtsOutput').textContent = 'Error connecting to Grok. Check your API key in Setup, ensure it has credits, or try again later. (Tip: Keys from https://console.x.ai)';
+        document.getElementById('thoughtsOutput').textContent = 'Error connecting to Grok. Check your API key in Setup.';
       }
     }
   </script>
