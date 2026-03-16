@@ -6,24 +6,31 @@
   <title>Octopus Covenant - Home</title>
   <link rel="icon" href="assets/favicon.ico">
   <style>
-    body, html {
+   body, html {
       margin: 0;
       padding: 0;
-      height: 100%;
+      /* Change height to min-height to allow scrolling */
+      min-height: 100%; 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #e0f7fa;
       background: #0a1f44 url('octopus-level1-bg.jpg') no-repeat center center fixed;
       background-size: cover;
     }
+
     .overlay {
-      height: 100%;
+      /* min-height ensures it covers the screen but expands if needed */
+      min-height: 100vh; 
       background: rgba(10, 31, 68, 0.65);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 20px;
+      /* Changed from center to flex-start so it doesn't cut off the top */
+      justify-content: flex-start; 
+      /* Add more top padding for breathing room on mobile */
+      padding: 60px 20px; 
       box-sizing: border-box;
+      /* Allows the page to scroll naturally */
+      overflow-y: auto; 
     }
     h1 {
       font-size: 3rem;
