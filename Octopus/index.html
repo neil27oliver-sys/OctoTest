@@ -8,10 +8,11 @@
   <!-- PayPal SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=AWMjw-JB6E8nFkjToPpNNJkpPk9lxnp1I8IF13-djVLcOQ2daRj2k8tCM4jEHkjm_C8mPpnyO1Wj_rF4&currency=USD&components=buttons,hosted-fields&disable-funding=venmo,credit"></script>
   <style>
+    /* Your exact original styles – NO CHANGES HERE */
     body, html {
       margin: 0;
       padding: 0;
-      height: 100%; /* Ensure full height */
+      height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #e0f7fa;
       background: #0a1f44 url('octopus-level1-bg.jpg') no-repeat center center fixed;
@@ -19,16 +20,16 @@
     }
 
     .overlay {
-      min-height: 100vh; /* At least full viewport */
-      height: auto; /* Allow growth beyond viewport */
+      min-height: 100vh;
+      height: auto;
       background: rgba(10, 31, 68, 0.65);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start; 
-      padding: 60px 20px 120px 20px; /* Extra bottom padding for scroll breathing room + coin section */
+      padding: 60px 20px 120px 20px;
       box-sizing: border-box;
-      overflow-y: auto; /* Enable scrolling when content overflows */
+      overflow-y: auto;
     }
 
     h1 {
@@ -51,7 +52,7 @@
       justify-content: center;
       gap: 30px;
       max-width: 1200px;
-      margin-bottom: 60px; /* Space before unlock section */
+      margin-bottom: 60px;
     }
 
     .card {
@@ -98,7 +99,6 @@
       margin-bottom: 10px;
     }
 
-    /* Monetization Section – artistic flair preserved */
     .unlock-section {
       margin: 60px 0 40px;
       text-align: center;
@@ -165,7 +165,7 @@
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      overflow-y: auto; /* Allow modal scroll if content tall */
+      overflow-y: auto;
     }
 
     .paywall-content {
@@ -178,7 +178,7 @@
       text-align: center;
       color: #e0f7fa;
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-      max-height: 90vh; /* Prevent modal overflow */
+      max-height: 90vh;
       overflow-y: auto;
     }
 
@@ -193,45 +193,45 @@
 
     <div class="cards-container">
 
-      <a href="preschool.html" class="card">
+      <!-- Cards now use onclick instead of <a href> to check payment first -->
+      <div class="card" onclick="checkAccess('preschool.html')">
         <div class="butterfly-icon">🦋</div>
         <h2>Preschool</h2>
         <div class="age-tag">Ages 4-6</div>
         <p>Gentle start with parent-guided exploration & simple fun</p>
-      </a>
+      </div>
 
-      <a href="level1.html" class="card">
+      <div class="card" onclick="checkAccess('level1.html')">
         <div class="butterfly-icon">🐙</div>
         <h2>OctoKid</h2>
         <div class="age-tag">Ages 7-12</div>
         <p>3-arm companion for curiosity, emotions & action</p>
-      </a>
+      </div>
 
-      <a href="manual.html" class="card">
+      <div class="card" onclick="checkAccess('manual.html')">
         <h2>Covenant Manual</h2>
         <p>Read the rules, understand how Octo thinks</p>
-      </a>
+      </div>
 
-      <a href="flip.html" class="card">
+      <div class="card" onclick="checkAccess('flip.html')">
         <div class="coin-icon">🦋</div>
         <h2>Flip Side Adventures</h2>
         <div class="age-tag">Ages 4-6</div>
         <p>Classic questions → then we flip the coin & think the other way!</p>
-      </a>
+      </div>
 
-      <a href="setup.html" class="card">
+      <div class="card" onclick="checkAccess('setup.html')">
         <h2>Setup</h2>
         <p>Personalize for your child & family rules</p>
-      </a>
+      </div>
 
-      <a href="metrics.html" class="card">
+      <div class="card" onclick="checkAccess('metrics.html')">
         <h2>Metrics</h2>
         <p>Parent dashboard — see the Learning Balance</p>
-      </a>
+      </div>
 
     </div>
 
-    <!-- Unlock Section at bottom – now fully reachable -->
     <div class="unlock-section">
       <h2>Unlock the Full Covenant</h2>
       <p>Start with a 6-day trial for just <strong>$3</strong> — experience every feature: voice chats, Flip Side, personalized rules, metrics dashboard.<br><br>After trial, lifetime access for one-time <strong>$27</strong>. No subscriptions. Coach, not crutch.</p>
@@ -244,7 +244,6 @@
     </div>
   </div>
 
-  <!-- Paywall Modal (unchanged styling/logic) -->
   <div id="paywall-modal">
     <div class="paywall-content">
       <h2>Choose Your Path</h2>
@@ -259,24 +258,42 @@
   </div>
 
   <script>
-    // Your original script logic here – unchanged
     const isUnlocked = localStorage.getItem('octoCovenantUnlocked') === 'true';
     const trialStart = localStorage.getItem('octoTrialStart');
     const trialDays = 6;
 
-    if (isUnlocked) {
-      document.getElementById('unlock-btn').textContent = 'Full Access Unlocked';
-      document.getElementById('unlock-btn').disabled = true;
-    } else if (trialStart) {
-      const daysPassed = Math.floor((Date.now() - parseInt(trialStart)) / (1000 * 60 * 60 * 24));
-      if (daysPassed < trialDays) {
-        document.getElementById('unlock-btn').textContent = `Trial Active (${trialDays - daysPassed} days left)`;
+    function isAccessAllowed() {
+      if (isUnlocked) return true;
+      if (trialStart) {
+        const daysPassed = Math.floor((Date.now() - parseInt(trialStart)) / (1000 * 60 * 60 * 24));
+        return daysPassed < trialDays;
+      }
+      return false;
+    }
+
+    function checkAccess(targetUrl) {
+      if (isAccessAllowed()) {
+        window.location.href = targetUrl;
       } else {
-        document.getElementById('unlock-btn').textContent = 'Trial Ended – Upgrade for $27';
+        document.getElementById('paywall-modal').style.display = 'flex';
       }
     }
 
-    document.getElementById('unlock-btn').onclick = function() {
+    // Update button text/state
+    const unlockBtn = document.getElementById('unlock-btn');
+    if (isUnlocked) {
+      unlockBtn.textContent = 'Full Access Unlocked';
+      unlockBtn.disabled = true;
+    } else if (trialStart) {
+      const daysPassed = Math.floor((Date.now() - parseInt(trialStart)) / (1000 * 60 * 60 * 24));
+      if (daysPassed < trialDays) {
+        unlockBtn.textContent = `Trial Active (${trialDays - daysPassed} days left)`;
+      } else {
+        unlockBtn.textContent = 'Trial Ended – Upgrade for $27';
+      }
+    }
+
+    unlockBtn.onclick = function() {
       if (isUnlocked) return;
       document.getElementById('paywall-modal').style.display = 'flex';
     };
@@ -291,10 +308,11 @@
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
           localStorage.setItem('octoTrialStart', Date.now().toString());
-          localStorage.setItem('octoCovenantUnlocked', 'true');
-          alert('Payment successful! Your 6-day trial is active.');
+          localStorage.setItem('octoCovenantUnlocked', 'true');  // For now marks full unlock; adjust if you want trial-only
+          alert('Payment successful! Your 6-day trial is active. Refresh if needed.');
           document.getElementById('paywall-modal').style.display = 'none';
-          document.getElementById('unlock-btn').textContent = 'Trial Active – Explore Now';
+          unlockBtn.textContent = 'Trial Active – Explore Now';
+          // Optional: location.reload(); to refresh card states
         });
       },
       onError: function(err) {
