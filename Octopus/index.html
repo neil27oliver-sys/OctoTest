@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Octopus Covenant - Home</title>
   <link rel="icon" href="assets/favicon.ico">
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AWMjw-JB6E8nFkjToPpNNJkpPk9lxnp1I8IF13-djVLcOQ2daRj2k8tCM4jEHkjm_C8mPpnyO1Wj_rF4&currency=USD&components=buttons,hosted-fields&disable-funding=venmo,credit"></script>
   <style>
-   body, html {
+    body, html {
       margin: 0;
       padding: 0;
-      /* Change height to min-height to allow scrolling */
-      min-height: 100%; 
+      height: 100%; /* Ensure full height */
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #e0f7fa;
       background: #0a1f44 url('octopus-level1-bg.jpg') no-repeat center center fixed;
@@ -18,39 +19,41 @@
     }
 
     .overlay {
-      /* min-height ensures it covers the screen but expands if needed */
-      min-height: 100vh; 
+      min-height: 100vh; /* At least full viewport */
+      height: auto; /* Allow growth beyond viewport */
       background: rgba(10, 31, 68, 0.65);
       display: flex;
       flex-direction: column;
       align-items: center;
-      /* Changed from center to flex-start so it doesn't cut off the top */
       justify-content: flex-start; 
-      /* Add more top padding for breathing room on mobile */
-      padding: 60px 20px; 
+      padding: 60px 20px 120px 20px; /* Extra bottom padding for scroll breathing room + coin section */
       box-sizing: border-box;
-      /* Allows the page to scroll naturally */
-      overflow-y: auto; 
+      overflow-y: auto; /* Enable scrolling when content overflows */
     }
+
     h1 {
       font-size: 3rem;
       margin: 0 0 20px;
       text-shadow: 0 0 10px #00ff9d;
       text-align: center;
     }
+
     .subtitle {
       font-size: 1.4rem;
       margin: 0 0 50px;
       text-align: center;
       max-width: 800px;
     }
+
     .cards-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 30px;
       max-width: 1200px;
+      margin-bottom: 60px; /* Space before unlock section */
     }
+
     .card {
       background: rgba(0, 255, 157, 0.12);
       border: 2px solid #00ff9d;
@@ -65,30 +68,121 @@
       text-decoration: none;
       color: inherit;
     }
+
     .card:hover {
       transform: translateY(-10px);
       box-shadow: 0 16px 48px rgba(0,255,157,0.4);
       background: rgba(0, 255, 157, 0.2);
     }
+
     .card h2 {
       margin: 0 0 10px;
       font-size: 1.8rem;
       color: #00ff9d;
     }
+
     .card .age-tag {
       font-size: 1rem;
       color: #b2f2bb;
       margin-bottom: 10px;
       display: block;
     }
+
     .card p {
       font-size: 1.1rem;
       margin: 0;
     }
+
     .butterfly-icon {
       font-size: 3rem;
       margin-bottom: 10px;
     }
+
+    /* Monetization Section – artistic flair preserved */
+    .unlock-section {
+      margin: 60px 0 40px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .unlock-section h2 {
+      font-size: 2.5rem;
+      color: #ffd700;
+      text-shadow: 0 0 15px #ffd700;
+      margin-bottom: 20px;
+    }
+
+    .unlock-section p {
+      font-size: 1.3rem;
+      margin: 0 0 30px;
+      line-height: 1.5;
+    }
+
+    .coin-container {
+      margin: 30px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+      border: 4px solid #ffd700;
+      transition: transform 0.4s ease;
+    }
+
+    .coin-container:hover {
+      transform: scale(1.08);
+    }
+
+    .coin-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #unlock-btn {
+      padding: 18px 60px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #00ff9d, #00b37a);
+      color: #0a1f44;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0, 255, 157, 0.5);
+      transition: all 0.3s;
+    }
+
+    #unlock-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0, 255, 157, 0.7);
+    }
+
+    #paywall-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 31, 68, 0.85);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      overflow-y: auto; /* Allow modal scroll if content tall */
+    }
+
+    .paywall-content {
+      background: rgba(0, 255, 157, 0.1);
+      backdrop-filter: blur(10px);
+      border: 2px solid #00ff9d;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 420px;
+      text-align: center;
+      color: #e0f7fa;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      max-height: 90vh; /* Prevent modal overflow */
+      overflow-y: auto;
+    }
+
+    .paywall-content h2 { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
   </style>
 </head>
 <body>
@@ -118,7 +212,7 @@
         <p>Read the rules, understand how Octo thinks</p>
       </a>
 
-       <a href="flip.html" class="card">
+      <a href="flip.html" class="card">
         <div class="coin-icon">🦋</div>
         <h2>Flip Side Adventures</h2>
         <div class="age-tag">Ages 4-6</div>
@@ -136,7 +230,79 @@
       </a>
 
     </div>
+
+    <!-- Unlock Section at bottom – now fully reachable -->
+    <div class="unlock-section">
+      <h2>Unlock the Full Covenant</h2>
+      <p>Start with a 6-day trial for just <strong>$3</strong> — experience every feature: voice chats, Flip Side, personalized rules, metrics dashboard.<br><br>After trial, lifetime access for one-time <strong>$27</strong>. No subscriptions. Coach, not crutch.</p>
+      
+      <div class="coin-container">
+        <img src="assets/coin.png" alt="Octopus Covenant Coin – Butterfly Transformation">
+      </div>
+      
+      <button id="unlock-btn">Unlock Now – Start 6-Day Trial</button>
+    </div>
   </div>
+
+  <!-- Paywall Modal (unchanged styling/logic) -->
+  <div id="paywall-modal">
+    <div class="paywall-content">
+      <h2>Choose Your Path</h2>
+      <p>6-Day Trial: <strong>$3.00 USD</strong><br>Lifetime Access after trial: <strong>$27.00 USD</strong> one-time</p>
+      <p style="font-size: 1rem; opacity: 0.9;">Secure • No subscription • Full features unlocked</p>
+      <div id="paypal-button-container" style="margin: 30px 0;"></div>
+      <button onclick="document.getElementById('paywall-modal').style.display='none'" 
+              style="padding:14px 50px; background:#e0f7fa; color:#0a1f44; border:none; border-radius:50px; cursor:pointer; font-weight:bold;">
+        BACK
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Your original script logic here – unchanged
+    const isUnlocked = localStorage.getItem('octoCovenantUnlocked') === 'true';
+    const trialStart = localStorage.getItem('octoTrialStart');
+    const trialDays = 6;
+
+    if (isUnlocked) {
+      document.getElementById('unlock-btn').textContent = 'Full Access Unlocked';
+      document.getElementById('unlock-btn').disabled = true;
+    } else if (trialStart) {
+      const daysPassed = Math.floor((Date.now() - parseInt(trialStart)) / (1000 * 60 * 60 * 24));
+      if (daysPassed < trialDays) {
+        document.getElementById('unlock-btn').textContent = `Trial Active (${trialDays - daysPassed} days left)`;
+      } else {
+        document.getElementById('unlock-btn').textContent = 'Trial Ended – Upgrade for $27';
+      }
+    }
+
+    document.getElementById('unlock-btn').onclick = function() {
+      if (isUnlocked) return;
+      document.getElementById('paywall-modal').style.display = 'flex';
+    };
+
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{ amount: { value: '3.00' } }],
+          application_context: { shipping_preference: "NO_SHIPPING" }
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          localStorage.setItem('octoTrialStart', Date.now().toString());
+          localStorage.setItem('octoCovenantUnlocked', 'true');
+          alert('Payment successful! Your 6-day trial is active.');
+          document.getElementById('paywall-modal').style.display = 'none';
+          document.getElementById('unlock-btn').textContent = 'Trial Active – Explore Now';
+        });
+      },
+      onError: function(err) {
+        console.error('PayPal error:', err);
+        alert('Payment issue — please try again.');
+      }
+    }).render('#paypal-button-container');
+  </script>
 
 </body>
 </html>
